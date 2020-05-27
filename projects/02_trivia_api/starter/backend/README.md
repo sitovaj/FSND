@@ -66,28 +66,315 @@ One note before you delve into your tasks: for each endpoint you are expected to
 8. Create a POST endpoint to get questions to play the quiz. This endpoint should take category and previous question parameters and return a random questions within the given category, if provided, and that is not one of the previous questions. 
 9. Create error handlers for all expected errors including 400, 404, 422 and 500. 
 
-REVIEW_COMMENT
-```
-This README is missing documentation of your endpoints. Below is an example for your endpoint to get all categories. Please use it as a reference for creating your documentation and resubmit your code. 
+## API Reference
+
+Getting Started 
+
+- URL to connect: the backend is hosted at the default http://127.0.0.1:5000/ or http://localhost:3000/ on local machine.
+- Authentication: for connecting API authentication or API keys are not required.
+
+Error Handling
+
+Errors are returned as JSON objects in the following format:
+    {
+    "success": False, 
+    "error": 404,
+    "message": "Not found"
+    }
+
+The API will return three error types when requests fail:
+400: Bad request, server couldnt understand it
+404: Not found
+405: Method not allowed
+422: Unprocessable Entity, check your request
+500: Internal Server Error, check your request
 
 Endpoints
-GET '/categories'
-GET ...
-POST ...
-DELETE ...
+- GET '/categories'
+    * Returns list of categories and success value.
+    * Category values are formated as 'id' and 'type' per row.
+    * Sample: curl http://127.0.0.1:5000/categories
 
-GET '/categories'
-- Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
-- Request Arguments: None
-- Returns: An object with a single key, categories, that contains a object of id: category_string key:value pairs. 
-{'1' : "Science",
-'2' : "Art",
-'3' : "Geography",
-'4' : "History",
-'5' : "Entertainment",
-'6' : "Sports"}
+        {
+        "categories": {
+            "1": "Science",
+            "2": "Art",
+            "3": "Geography",
+            "4": "History",
+            "5": "Entertainment",
+            "6": "Sports"
+        },
+        "success": true
+        }
 
-```
+- GET '/questions'
+    * Returns list of question objects, success value, total number of questions, as well as list of available categories and current category.
+    * Question results are paginated in groups of 10. Request argument 'page' allow to chose page number, starting from 1.
+    * Sample: curl http://127.0.0.1:5000/questions
+
+        {
+        "categories": {
+            "1": "Science",
+            "2": "Art",
+            "3": "Geography",
+            "4": "History",
+            "5": "Entertainment",
+            "6": "Sports"
+        },
+        "current_category": null,
+        "questions": [
+            {
+            "answer": "test",
+            "category": "test",
+            "difficulty": 2,
+            "id": 1,
+            "question": "Test1"
+            },
+            {
+            "answer": "Apollo 13",
+            "category": "5",
+            "difficulty": 4,
+            "id": 2,
+            "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
+            },
+            {
+            "answer": "Tom Cruise",
+            "category": "5",
+            "difficulty": 4,
+            "id": 4,
+            "question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?"
+            },
+            {
+            "answer": "Maya Angelou",
+            "category": "4",
+            "difficulty": 2,
+            "id": 5,
+            "question": "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?"
+            },
+            {
+            "answer": "Edward Scissorhands",
+            "category": "5",
+            "difficulty": 3,
+            "id": 6,
+            "question": "What was the title of the 1990 fantasy directed by Tim Burton about a young man with multi-bladed appendages?"
+            },
+            {
+            "answer": "Muhammad Ali",
+            "category": "4",
+            "difficulty": 1,
+            "id": 9,
+            "question": "What boxer's original name is Cassius Clay?"
+            },
+            {
+            "answer": "Brazil",
+            "category": "6",
+            "difficulty": 3,
+            "id": 10,
+            "question": "Which is the only team to play in every soccer World Cup tournament?"
+            },
+            {
+            "answer": "Uruguay",
+            "category": "6",
+            "difficulty": 4,
+            "id": 11,
+            "question": "Which country won the first ever soccer World Cup in 1930?"
+            },
+            {
+            "answer": "Lake Victoria",
+            "category": "3",
+            "difficulty": 2,
+            "id": 13,
+            "question": "What is the largest lake in Africa?"
+            },
+            {
+            "answer": "The Palace of Versailles",
+            "category": "3",
+            "difficulty": 3,
+            "id": 14,
+            "question": "In which royal palace would you find the Hall of Mirrors?"
+            }
+        ],
+        "success": true,
+        "total_questions": 22
+        }
+
+- POST '/questions'
+    * Creates new question using the submitted data:
+        question, answer, category id (from existing), difficulty.
+    * Returns the success value. 
+    * Sample: curl 127.0.0.1:5000/questions -X POST -H "Content-Type: application/json" -d '{"answer": "George Washington Carver", "category": "4", "difficulty": 2, "question": "Who invented Peanut Butter?"}'
+
+        {
+        "success": true
+        }
+
+    * Can be used to search questions by keywords in values of questions.
+    * Sample: curl  127.0.0.1:5000/quizzes -X POST -H "Content-Type: application/json" -d '{"category": "2"}'
+
+        {
+        "error": 404,
+        "message": "Not found",
+        "success": false
+        }
+
+- DELETE '/questions/<int:question_id>'
+    * Deletes the question of the given ID if it exists. 
+    * Returns success value, ID of deleted question, list of questions, total number of questions, as well as list of available categories.
+    * Sample: curl  127.0.0.1:5000/questions/2 -X DELETE
+
+        {
+        "categories": {
+            "1": "Science",
+            "2": "Art",
+            "3": "Geography",
+            "4": "History",
+            "5": "Entertainment",
+            "6": "Sports"
+        },
+        "deleted": 2,
+        "questions": [
+            {
+            "answer": "test",
+            "category": "test",
+            "difficulty": 2,
+            "id": 1,
+            "question": "Test1"
+            },
+            {
+            "answer": "Tom Cruise",
+            "category": "5",
+            "difficulty": 4,
+            "id": 4,
+            "question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?"
+            },
+            {
+            "answer": "Maya Angelou",
+            "category": "4",
+            "difficulty": 2,
+            "id": 5,
+            "question": "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?"
+            },
+            {
+            "answer": "Edward Scissorhands",
+            "category": "5",
+            "difficulty": 3,
+            "id": 6,
+            "question": "What was the title of the 1990 fantasy directed by Tim Burton about a young man with multi-bladed appendages?"
+            },
+            {
+            "answer": "Muhammad Ali",
+            "category": "4",
+            "difficulty": 1,
+            "id": 9,
+            "question": "What boxer's original name is Cassius Clay?"
+            },
+            {
+            "answer": "Brazil",
+            "category": "6",
+            "difficulty": 3,
+            "id": 10,
+            "question": "Which is the only team to play in every soccer World Cup tournament?"
+            },
+            {
+            "answer": "Uruguay",
+            "category": "6",
+            "difficulty": 4,
+            "id": 11,
+            "question": "Which country won the first ever soccer World Cup in 1930?"
+            },
+            {
+            "answer": "Lake Victoria",
+            "category": "3",
+            "difficulty": 2,
+            "id": 13,
+            "question": "What is the largest lake in Africa?"
+            },
+            {
+            "answer": "The Palace of Versailles",
+            "category": "3",
+            "difficulty": 3,
+            "id": 14,
+            "question": "In which royal palace would you find the Hall of Mirrors?"
+            },
+            {
+            "answer": "Agra",
+            "category": "3",
+            "difficulty": 2,
+            "id": 15,
+            "question": "The Taj Mahal is located in which Indian city?"
+            }
+        ],
+        "success": true,
+        "total_questions": 24
+        }
+
+
+
+
+- GET '/categories/<int:category_id>/questions'
+    * Allows to get questions based on category ID.
+    * Returns success value, list of questions, total number of questions, selected category, as well as list of available categories.
+    * Sample: curl  127.0.0.1:5000/categories/1/questions
+
+        {
+        "categories": {
+            "1": "Science",
+            "2": "Art",
+            "3": "Geography",
+            "4": "History",
+            "5": "Entertainment",
+            "6": "Sports"
+        },
+        "current_category": 1,
+        "questions": [
+            {
+            "answer": "The Liver",
+            "category": "1",
+            "difficulty": 4,
+            "id": 20,
+            "question": "What is the heaviest organ in the human body?"
+            },
+            {
+            "answer": "Alexander Fleming",
+            "category": "1",
+            "difficulty": 3,
+            "id": 21,
+            "question": "Who discovered penicillin?"
+            },
+            {
+            "answer": "Blood",
+            "category": "1",
+            "difficulty": 4,
+            "id": 22,
+            "question": "Hematology is a branch of medicine involving the study of what?"
+            },
+            {
+            "answer": "testttt",
+            "category": "1",
+            "difficulty": 1,
+            "id": 25,
+            "question": "testt"
+            }
+        ],
+        "success": true,
+        "total_questions": 4
+        }
+
+- POST '/quizzes'
+    * Enpoint for getting questions to lay the quiz. Expects selected category ID and previous question ID parametres and return a random question of given category, that don't match previous questions.
+    * Returns success value and next unique question, if there's still left.
+    * Sample: curl  127.0.0.1:5000/quizzes -X POST -H "Content-Type: application/json" -d '{"quiz_category": {"id": "2"},"previous_questions": [16, 17, 18]}'
+
+        {
+        "question": {
+            "answer": "Jackson Pollock",
+            "category": "2",
+            "difficulty": 2,
+            "id": 19,
+            "question": "Which American artist was a pioneer of Abstract Expressionism, and a leading exponent of action painting?"
+        },
+        "success": true
+        }
 
 
 ## Testing
